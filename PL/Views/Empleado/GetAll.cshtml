@@ -1,0 +1,367 @@
+﻿@{
+    ViewBag.Title = "GetAll";
+}
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+@*<script src="https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">*@
+
+<script src="~/Scripts/ValidacionesCampos.js"></script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Empleados</h2>
+            <p>En este modulo podras ver todos los empleados registrados</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-11">
+            @*@Html.ActionLink("Agregar", "Form", "Empleado", htmlAttributes: new { @class = "btn btn-success"})*@
+            <button type="button" class="btn btn-success" id="btnAnadir">Agregar</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table id="EmpleadosTable" class="table table-bordered display">
+                <thead>
+                    <tr>
+                        <td align="center">Editar</td>
+                        <td align="center" class="hidden">IdEmpleado</td>
+                        <td align="center">Nombre</td>
+                        <td align="center">Apellido Paterno</td>
+                        <td align="center">Apellido Materno</td>
+                        <td align="center">IdEstado</td>
+                        <td align="center">Telefono</td>
+                        <td align="center">IdRol</td>
+                        <td align="center">Eliminar</td>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Formulario" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title" id="myModalLabel">Actualizar empleados</h4>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        @*lblNombre ddlMateria txtApellidoPaterno*@
+                        <input type="text" class="form-control" id="txtIdEmpleado" placeholder="IdEmpleado" disabled="disabled" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="txtNombre" placeholder="Nombre" onkeypress="return SoloLetras(event)" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="txtApellidoPaterno" placeholder="ApellidoPaterno" onkeypress="return SoloLetras(event)" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="txtApellidoMaterno" placeholder="ApellidoMaterno" onkeypress="return SoloLetras(event)"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="txtTelefono" placeholder="Telefono" onkeypress="return SoloNumeros(event)" />
+                    </div>
+                    <div class="form-group">
+                        <select id="ddlEstado" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <select id="ddlRol" class="form-control"></select>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnUpdate" onclick="Guardar()">Guardar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*<div class="modal fade" id="ModalAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Actualizar empleados</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtNombre" placeholder="Nombre" />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtApellidoPaterno" placeholder="ApellidoPaterno" />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtApellidoMaterno" placeholder="ApellidoMaterno" />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="txtTelefono" placeholder="ApellidoMaterno" />
+                        </div>
+                        <div class="form-group">
+                            <select id="ddlEstado" class="form-control"></select>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btnAdd" onclick="Add()">Agregar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetAllJson();
+        EstadoGetAll();
+        RolGetAll();
+        $('#btnAnadir').click(function () {
+            $('#Formulario').modal('show');
+            $("#txtIdEmpleado").hide();
+            InitializeControls();
+            SoloNumeros(e);
+            SoloLetras();
+        });
+
+
+        //$('#EmpleadosTable').DataTable();
+
+        //$('#EmpleadosTable').DataTable().rows().iterator('row', function (context, index) {
+        //    var node = $(this.row(index).node());
+
+
+
+
+            $("#EmpleadosTable").on("click", "#btnDelete", function () {
+                $(this).closest("tr").remove();
+            });
+
+
+    });
+    function SoloLetras(e) {
+        var key = error.keyCode || error.which;
+        var caracter = error.key;
+        if (!/^[a-zA-Z]*$/g.test(caracter)) {
+            alert("Solo se aceptan letras");
+            return false;
+
+        }
+        else {
+            return true;
+        }
+    }
+
+        function GetAllJson() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetAllJson", "Empleado")',
+                success: function (result) {
+                    $('#EmpleadosTable tbody').empty();
+                    $.each(result.Objects, function (i, empleado) {
+                        var filas =
+                            '<tr>' +
+                                '<td class="text-center">' +
+                                    '<a class="btn btn-warning glyphicon glyphicon-edit" href="#" onclick="GetById(' + empleado.IdEmpleado + ')">' + '</a>' +
+                                '</td>' +
+                                "<td class='hidden'>" + empleado.IdEmpleado + "</td>" +
+                                "<td class='text-center'>" + empleado.Nombre + "</td>" +
+                                "<td class='text-center'>" + empleado.ApellidoPaterno + "</td>" +
+                                "<td class='text-center'>" + empleado.ApellidoMaterno + "</td>" +
+                                "<td class='text-center'>" + empleado.Estado.IdEstado + "</td>" +
+                                "<td class='text-center'>" + empleado.Telefono + "</td>" +
+                                "<td class='text-center'>" + empleado.Rol.IdRol + "</td>"
+                                + '<td class="text-center"> <button class="btn btn-danger" id="btnDelete"><span class="glyphicon glyphicon-trash" style="color:#FFFFFF"></span></button></td>'
+
+                            + '</tr>';
+                        $("#EmpleadosTable tbody").append(filas);
+                    });
+                },
+                error: function (result) {
+                    alert('Error en la consulta.' + result.responseJson.result);
+                }
+            });
+        };
+
+        //onclick="Eliminar(' + empleado.IdEmpleado + ')"
+
+        function GetById(IdEmpleado) {
+            InitializeControls();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetById","Empleado")?IdEmpleado=' + IdEmpleado,
+                success: function (result) {
+                    $('#txtIdEmpleado').val(result.Object.IdEmpleado);
+                    $('#txtNombre').val(result.Object.Nombre);
+                    $('#txtApellidoPaterno').val(result.Object.ApellidoPaterno);
+                    $('#txtApellidoMaterno').val(result.Object.ApellidoMaterno);
+                    $('#txtTelefono').val(result.Object.Telefono);
+                    $('#ddlEstado').val(result.Object.Estado.IdEstado);
+                    $('#ddlRol').val(result.Object.Rol.IdRol);
+
+                    $('#Formulario').modal('show');
+                },
+                error: function (result) {
+                    alert('error en la consulta.' + result.responseJSON.ErrorMessage);
+                }
+            });
+        };
+
+        function Guardar() {
+            var txtIdEmpleado = $('#txtIdEmpleado').val();
+            if (txtIdEmpleado == "") {
+                Add();
+            }
+            else {
+                Update();
+            }
+        }
+        function InitializeControls() {
+            document.getElementById("txtIdEmpleado").value = "";
+            document.getElementById("txtNombre").value = "";
+            document.getElementById("txtApellidoPaterno").value = "";
+            document.getElementById("txtApellidoMaterno").value = "";
+            document.getElementById("ddlEstado").value = 0;
+            document.getElementById("txtTelefono").value = "";
+            document.getElementById("ddlRol").value = 0;
+        }
+        function GetJSONEmpleado() {
+            var txtIdEmpleado = document.getElementById("txtIdEmpleado").value;
+            var txtNombre = document.getElementById("txtNombre").value;
+            var txtApellidoPaterno = document.getElementById("txtApellidoPaterno").value;
+            var txtApellidoMaterno = document.getElementById("txtApellidoMaterno").value;
+            var ddlIdEstado = document.getElementById("ddlEstado").value;
+            var txtTelefono = document.getElementById("txtTelefono").value;
+            var ddlIdRol = document.getElementById("ddlRol").value;
+
+
+            var empleado = {
+                IdEmpleado: txtIdEmpleado,
+                Nombre: txtNombre,
+                ApellidoPaterno: txtApellidoPaterno,
+                ApellidoMaterno: txtApellidoMaterno,
+                Estado: {
+                    IdEstado: ddlIdEstado
+                },
+                Telefono: txtTelefono,
+                Rol: {
+                    IdRol: ddlIdRol
+                }
+            }
+            return empleado;
+        };
+
+        function Add() {
+            
+            var empleado = GetJSONEmpleado();
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Add", "Empleado")',
+                dataType: 'json',
+                data: empleado,
+                success: function (result) {
+                    $('#Formulario').modal('hide');
+                    GetAllJson();
+                    alert('Empleado agregado correctamente');
+                },
+                error: function (result) {
+                    alert('Error en la consulta.' + result.responseJSON.ErrorMessage);
+                }
+            });
+        };
+
+        function Update() {
+
+            var empleado = GetJSONEmpleado();
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Update","Empleado")', //'http://localhost:2131/api/Empleado/Update/',
+                datatype: 'json',
+                data: empleado,
+                success: function (result) {
+                    $('#Formulario').modal('hide');
+                    GetAll();
+                    alert('Empleado actualizado correctamente');
+                },
+                error: function (result) {
+                    alert('Error en la consulta.' + result.responseJSON.ErrorMessage);
+                }
+            });
+
+        };
+
+        function EstadoGetAll() {
+            $("#ddlEstado").empty();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("EstadoGetAll", "Empleado")', //'http://localhost:14982/api/Categoria/GetAll',
+                success: function (result) {
+                    $("#ddlEstado").append('<option value="' + 0 + '">' + 'Seleccione una opción' + '</option>');
+                    $.each(result.Objects, function (i, estado) {
+                        $("#ddlEstado").append('<option value="'
+                                                   + estado.IdEstado + '">'
+                                                   + estado.Nombre + '</option>');
+                    });
+                }
+            });
+        };
+
+        function RolGetAll() {
+            $("#ddlRol").empty();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("RolGetAll", "Empleado")', //'http://localhost:14982/api/Categoria/GetAll',
+                success: function (result) {
+                    $("#ddlRol").append('<option value="' + 0 + '">' + 'Seleccione una opción' + '</option>');
+                    $.each(result.Objects, function (i, rol) {
+                        $("#ddlRol").append('<option value="'
+                                                   + rol.IdRol + '">'
+                                                   + rol.Nombre + '</option>');
+                    });
+                }
+            });
+        };
+
+    @*function Eliminar(IdEmpleado) {
+
+            @*if (confirm("¿Estas seguro de eliminar el empleado seleccionado?")) {
+            $.ajax({
+                type: 'Get',
+                url: '@Url.Action("DeleteJson", "Empleado")?IdEmpleado=' + IdEmpleado, //'http://localhost:2131/api/Empleado/Delete/' + IdEmpleado,
+                success: function (result) {
+                    GetList();
+                },
+                error: function (result) {
+                    alert('Error en la consulta.' + result.responseJSON.ErrorMessage);
+                }
+            });
+
+        };
+        };*@
+
+    //VALIDACIONES
+</script>
+
